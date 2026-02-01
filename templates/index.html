@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader - Download Videos & Audio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-download"></i>
+                    <span>Video Downloader</span>
+                </div>
+                <nav class="nav">
+                    <a href="#" class="nav-link active" data-tab="download">
+                        <i class="fas fa-cloud-download-alt"></i> Download
+                    </a>
+                    <a href="#" class="nav-link" data-tab="batch">
+                        <i class="fas fa-layer-group"></i> Batch
+                    </a>
+                    <a href="#" class="nav-link" data-tab="history">
+                        <i class="fas fa-history"></i> History
+                    </a>
+                    <a href="#" class="nav-link" data-tab="library">
+                        <i class="fas fa-folder"></i> Library
+                    </a>
+                    <a href="#" class="nav-link" data-tab="about">
+                        <i class="fas fa-info-circle"></i> About
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Download Tab -->
+            <section id="download-tab" class="tab-content active">
+                <div class="download-section">
+                    <h1 class="section-title">
+                        <i class="fas fa-video"></i>
+                        Download Videos & Audio
+                    </h1>
+                    <p class="section-subtitle">
+                        Paste a URL from YouTube, Vimeo, Twitter, TikTok, and 1000+ other sites
+                    </p>
+
+                    <!-- URL Input -->
+                    <div class="url-input-container">
+                        <div class="input-wrapper">
+                            <i class="fas fa-link input-icon"></i>
+                            <input type="text" id="url-input" placeholder="Paste video URL here..." autocomplete="off">
+                            <button id="fetch-btn" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                <span>Fetch</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loading-state" class="loading-state hidden">
+                        <div class="spinner"></div>
+                        <p>Fetching video information...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="error-state" class="error-state hidden">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p id="error-message"></p>
+                        <button id="retry-btn" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+
+                    <!-- Video Info Card -->
+                    <div id="video-info" class="video-info-card hidden">
+                        <div class="video-preview">
+                            <img id="video-thumbnail" src="" alt="Video thumbnail">
+                            <div class="video-duration" id="video-duration"></div>
+                        </div>
+                        <div class="video-details">
+                            <h2 id="video-title" class="video-title"></h2>
+                            <div class="video-meta">
+                                <span id="video-uploader">
+                                    <i class="fas fa-user"></i>
+                                    <span></span>
+                                </span>
+                                <span id="video-views">
+                                    <i class="fas fa-eye"></i>
+                                    <span></span>
+                                </span>
+                            </div>
+                            <p id="video-description" class="video-description"></p>
+                        </div>
+                    </div>
+
+                    <!-- Download Options -->
+                    <div id="download-options" class="download-options hidden">
+                        <h3 class="options-title">
+                            <i class="fas fa-cog"></i>
+                            Download Options
+                        </h3>
+
+                        <!-- Format Toggle -->
+                        <div class="format-toggle">
+                            <button class="format-btn active" data-format="video">
+                                <i class="fas fa-video"></i>
+                                Video
+                            </button>
+                            <button class="format-btn" data-format="audio">
+                                <i class="fas fa-music"></i>
+                                Audio Only
+                            </button>
+                        </div>
+
+                        <!-- Video Options -->
+                        <div id="video-options" class="options-group">
+                            <label class="option-label">Video Quality</label>
+                            <div class="quality-grid">
+                                <button class="quality-btn active" data-quality="best">
+                                    <i class="fas fa-crown"></i>
+                                    <span>Best</span>
+                                </button>
+                                <button class="quality-btn" data-quality="2160">
+                                    <span>4K</span>
+                                    <small>2160p</small>
+                                </button>
+                                <button class="quality-btn" data-quality="1440">
+                                    <span>2K</span>
+                                    <small>1440p</small>
+                                </button>
+                                <button class="quality-btn" data-quality="1080">
+                                    <span>FHD</span>
+                                    <small>1080p</small>
+                                </button>
+                                <button class="quality-btn" data-quality="720">
+                                    <span>HD</span>
+                                    <small>720p</small>
+                                </button>
+                                <button class="quality-btn" data-quality="480">
+                                    <span>SD</span>
+                                    <small>480p</small>
+                                </button>
+                                <button class="quality-btn" data-quality="360">
+                                    <span>Low</span>
+                                    <small>360p</small>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Audio Options -->
+                        <div id="audio-options" class="options-group hidden">
+                            <label class="option-label">Audio Format</label>
+                            <div class="audio-format-grid">
+                                <button class="audio-format-btn active" data-format="mp3">
+                                    <i class="fas fa-file-audio"></i>
+                                    <span>MP3</span>
+                                </button>
+                                <button class="audio-format-btn" data-format="m4a">
+                                    <i class="fas fa-file-audio"></i>
+                                    <span>M4A</span>
+                                </button>
+                                <button class="audio-format-btn" data-format="wav">
+                                    <i class="fas fa-file-audio"></i>
+                                    <span>WAV</span>
+                                </button>
+                                <button class="audio-format-btn" data-format="flac">
+                                    <i class="fas fa-file-audio"></i>
+                                    <span>FLAC</span>
+                                </button>
+                                <button class="audio-format-btn" data-format="opus">
+                                    <i class="fas fa-file-audio"></i>
+                                    <span>OPUS</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Subtitle Options -->
+                        <div id="subtitle-options" class="options-group subtitle-options">
+                            <label class="option-label">
+                                <i class="fas fa-closed-captioning"></i>
+                                Subtitles
+                            </label>
+                            <div class="subtitle-controls">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="download-subs">
+                                    <span>Download subtitles</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="embed-subs">
+                                    <span>Embed in video</span>
+                                </label>
+                            </div>
+                            <div id="subtitle-lang-group" class="subtitle-lang-group hidden">
+                                <label class="option-label-small">Language</label>
+                                <select id="subtitle-lang" class="select-input">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="pt">Portuguese</option>
+                                    <option value="it">Italian</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="ko">Korean</option>
+                                    <option value="zh">Chinese</option>
+                                    <option value="ar">Arabic</option>
+                                    <option value="hi">Hindi</option>
+                                    <option value="ru">Russian</option>
+                                </select>
+                                <div id="available-subs" class="available-subs hidden">
+                                    <small>Available: <span id="subs-list"></span></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Playlist Notice -->
+                        <div id="playlist-notice" class="playlist-notice hidden">
+                            <i class="fas fa-list"></i>
+                            <span>This is a playlist with <strong id="playlist-count">0</strong> videos</span>
+                            <button id="select-playlist-videos" class="btn btn-secondary btn-small">
+                                <i class="fas fa-check-square"></i> Select Videos
+                            </button>
+                        </div>
+
+                        <!-- Playlist Selection Modal -->
+                        <div id="playlist-selection" class="playlist-selection hidden">
+                            <div class="playlist-header">
+                                <h4><i class="fas fa-list"></i> Select Videos to Download</h4>
+                                <div class="playlist-actions">
+                                    <button id="select-all-playlist" class="btn btn-small">Select All</button>
+                                    <button id="deselect-all-playlist" class="btn btn-small">Deselect All</button>
+                                </div>
+                            </div>
+                            <div id="playlist-items" class="playlist-items"></div>
+                        </div>
+
+                        <!-- Download Button -->
+                        <button id="download-btn" class="btn btn-download">
+                            <i class="fas fa-download"></i>
+                            <span>Download</span>
+                        </button>
+                    </div>
+
+                    <!-- Active Downloads -->
+                    <div id="active-downloads" class="active-downloads hidden">
+                        <h3 class="section-subtitle">
+                            <i class="fas fa-tasks"></i>
+                            Active Downloads
+                        </h3>
+                        <div id="downloads-list" class="downloads-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Batch Download Tab -->
+            <section id="batch-tab" class="tab-content">
+                <div class="batch-section">
+                    <h1 class="section-title">
+                        <i class="fas fa-layer-group"></i>
+                        Batch Download
+                    </h1>
+                    <p class="section-subtitle">
+                        Download multiple videos at once. Paste one URL per line.
+                    </p>
+
+                    <!-- Batch URL Input -->
+                    <div class="batch-input-container">
+                        <textarea id="batch-urls" class="batch-textarea" placeholder="Paste URLs here (one per line)...
+https://www.youtube.com/watch?v=example1
+https://www.youtube.com/watch?v=example2
+https://vimeo.com/example3" rows="8"></textarea>
+                        <div class="batch-url-count">
+                            <span id="url-count">0</span> URLs
+                        </div>
+                    </div>
+
+                    <!-- Batch Options -->
+                    <div class="batch-options">
+                        <div class="batch-option-row">
+                            <label class="option-label">Format</label>
+                            <div class="format-toggle">
+                                <button class="format-btn batch-format-btn active" data-format="video">
+                                    <i class="fas fa-video"></i> Video
+                                </button>
+                                <button class="format-btn batch-format-btn" data-format="audio">
+                                    <i class="fas fa-music"></i> Audio
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="batch-option-row">
+                            <label class="option-label">Quality</label>
+                            <select id="batch-quality" class="select-input">
+                                <option value="best">Best Quality</option>
+                                <option value="2160">4K (2160p)</option>
+                                <option value="1440">2K (1440p)</option>
+                                <option value="1080">Full HD (1080p)</option>
+                                <option value="720">HD (720p)</option>
+                                <option value="480">SD (480p)</option>
+                            </select>
+                        </div>
+
+                        <div class="batch-option-row batch-audio-format hidden">
+                            <label class="option-label">Audio Format</label>
+                            <select id="batch-audio-format" class="select-input">
+                                <option value="mp3">MP3</option>
+                                <option value="m4a">M4A</option>
+                                <option value="wav">WAV</option>
+                                <option value="flac">FLAC</option>
+                                <option value="opus">OPUS</option>
+                            </select>
+                        </div>
+
+                        <div class="batch-option-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="batch-download-subs">
+                                <span>Download subtitles</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Batch Download Button -->
+                    <button id="batch-download-btn" class="btn btn-download">
+                        <i class="fas fa-download"></i>
+                        <span>Start Batch Download</span>
+                    </button>
+
+                    <!-- Batch Queue -->
+                    <div id="batch-queue" class="batch-queue hidden">
+                        <h3 class="section-subtitle">
+                            <i class="fas fa-tasks"></i>
+                            Download Queue
+                        </h3>
+                        <div id="batch-queue-list" class="downloads-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Tab -->
+            <section id="history-tab" class="tab-content">
+                <div class="history-section">
+                    <div class="history-header">
+                        <h1 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Download History
+                        </h1>
+                        <div class="history-actions">
+                            <div class="search-wrapper">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="history-search" placeholder="Search history..." class="search-input">
+                            </div>
+                            <button id="clear-history-btn" class="btn btn-danger btn-small">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="history-empty" class="history-empty hidden">
+                        <i class="fas fa-clock"></i>
+                        <p>No download history yet</p>
+                        <small>Your download history will appear here</small>
+                    </div>
+
+                    <div id="history-list" class="history-list"></div>
+
+                    <!-- History Pagination -->
+                    <div id="history-pagination" class="pagination hidden">
+                        <button id="history-prev" class="btn btn-secondary btn-small" disabled>
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="history-page-info" class="page-info">Page 1</span>
+                        <button id="history-next" class="btn btn-secondary btn-small">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Library Tab -->
+            <section id="library-tab" class="tab-content">
+                <div class="library-section">
+                    <div class="library-header">
+                        <h1 class="section-title">
+                            <i class="fas fa-folder-open"></i>
+                            Your Library
+                        </h1>
+                        <button id="refresh-library" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div id="library-empty" class="library-empty hidden">
+                        <i class="fas fa-inbox"></i>
+                        <p>No downloaded files yet</p>
+                        <small>Downloaded videos and audio will appear here</small>
+                    </div>
+
+                    <div id="library-files" class="library-files"></div>
+                </div>
+            </section>
+
+            <!-- About Tab -->
+            <section id="about-tab" class="tab-content">
+                <div class="about-section">
+                    <h1 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        About Video Downloader
+                    </h1>
+
+                    <div class="about-card">
+                        <h2><i class="fas fa-question-circle"></i> What is this?</h2>
+                        <p>
+                            Video Downloader is a web-based tool that allows you to download videos and audio 
+                            from various websites. It's powered by yt-dlp, a powerful command-line tool that 
+                            supports over 1000+ websites.
+                        </p>
+                    </div>
+
+                    <div class="about-card">
+                        <h2><i class="fas fa-check-circle"></i> Supported Sites</h2>
+                        <p>
+                            YouTube, Vimeo, Twitter/X, TikTok, Instagram, Facebook, Dailymotion, 
+                            Twitch, SoundCloud, Bandcamp, and many more!
+                        </p>
+                        <div id="supported-sites-list" class="supported-sites"></div>
+                    </div>
+
+                    <div class="about-card">
+                        <h2><i class="fas fa-star"></i> Features</h2>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Download videos in various qualities (up to 4K)</li>
+                            <li><i class="fas fa-check"></i> Extract audio in multiple formats (MP3, M4A, WAV, FLAC)</li>
+                            <li><i class="fas fa-check"></i> Real-time download progress tracking</li>
+                            <li><i class="fas fa-check"></i> Manage downloaded files in the library</li>
+                            <li><i class="fas fa-check"></i> Support for 1000+ websites</li>
+                            <li><i class="fas fa-check"></i> Clean and modern user interface</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-card warning">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Disclaimer</h2>
+                        <p>
+                            Please respect copyright laws and only download content that you have the right to access. 
+                            This tool is intended for personal use only.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>
+                Powered by <a href="https://github.com/yt-dlp/yt-dlp" target="_blank">yt-dlp</a>
+                &bull; Built with <i class="fas fa-heart" style="color: #e74c3c;"></i>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

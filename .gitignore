@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Database
+download_history.db
+
+# Downloaded files
+downloads/
+
+# OS files
+.DS_Store
